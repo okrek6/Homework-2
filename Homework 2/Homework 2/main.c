@@ -12,28 +12,44 @@
 typedef struct struct_bank
 {
 	int accn_num;
-  char *name;
+    char *name;
 	float amount;
 	struct struct_bank *nextNode;
 }Bank, *ptrToBank;
 
-Bank * build_list(char* filename);
 
-int main(int argc, const char * argv[]) {
-    // insert code here...
-    printf("Hello, World!\n");
-    return 0;
+//prototypes
+Bank * build_list(char* filename);
+Bank * create_node(int accn, char *n,float amt);
+Bank * insert_node(Bank* head, Bank* node);
+int check_list(Bank* head, char *n, int accn, float amt);
+Bank* update_list(char *str, Bank* head);
+Bank* delete_node( Bank* head);
+int write_output(char * str, Bank*head);
+void print_list(Bank *head );
+
+int main(int argc, char * argv[]) {
+//     It calls  build_list, update_list and delete_node functions and after each function calls print_list to print the linked list content. At the end it calls the write_output function.
+    
+    Bank bankPtr;
+    Bank newBankPtr;
+    Bank deletedBankPtr;
+    
+    bankPtr = *(build_list(argv[1]));
+    print_list(&bankPtr);
+    newBankPtr = *(update_list(argv[2], &bankPtr));
+    print_list(&newBankPtr);
+    deletedBankPtr = *(delete_node(&newBankPtr));
+    print_list(&deletedBankPtr);
+    write_output(argv[3], &deletedBankPtr);
+    
 }
 
 Bank * create_node(int accn, char *n,float amt)
 {
-//malloc in here as well
 
-  //ptrToBank head = NULL;
-  ptrToBank newNode;
-  //ptrToBank currNode = NULL;
-
-  newNode = malloc(sizeof(Bank));
+    ptrToBank newNode;
+    newNode = malloc(sizeof(Bank));
 
     if(newNode == NULL)
     {
@@ -44,26 +60,17 @@ Bank * create_node(int accn, char *n,float amt)
     if(newNode != NULL){
 
     newNode->accn_num = accn;
-    newNode-> name = n;// string copy which is strcopy
-    newNode-> amount = amt;
+    newNode->name = n;// string copy which is strcopy
+    newNode->amount = amt;
     newNode->nextNode = NULL;
-
-  //    if (head == NULL) {
-  //        head = newNode;
-  //    } else {
-  //        while (currNode->nextNode != NULL) {
-  //          currNode = currNode ->nextNode;
-  //      }
-  //      currNode -> nextNode = newNode;
-  //    }
-  //  return head;
-
 
 }
     return newNode;
 }
 
 Bank * insert_node(Bank* head, Bank* node){
+    
+    
 
 }
 
@@ -71,85 +78,111 @@ Bank * insert_node(Bank* head, Bank* node){
 //This function takes pointer head that points to the beginning of the linked list and inserts the node at the end of the list.
 
 Bank* build_list(char* filename){
-        //malloc in here for char and free it inside of here aswell.
         //fscanf the size out and then use another fscanf to get the account names.
+//This function takes the input file name (accounts.txt), opens the input file, reads the user information from the file pass it to create_node function. After that it call insert_node function with the created node (by the create_node) function and the pointer “head” pointing at the beginning of the linked list.At the end function returns the “head” pointer.
 
+    int accountNumber;
+    char *accountName = 0;
+    float accountAmount;
+    int size;
+    int i;
+    
+    FILE *file = fopen(filename, "r");
 
-        FILE *file = fopen(filename, "r");
+    if (file == NULL){
+        perror("file could not be opened");
+        exit(1);
+    }
 
-        if (file == NULL){
-            perror("file could not be opened");
-            exit(1);
-        }
+    ptrToBank head = NULL;
+    
+    fscanf(file, "%d", &size);
+    
+    for (i = 0; i < size; i++) {
+        
+        fscanf(file, "%s %f %d", accountName, &accountAmount, &accountNumber );
 
-        ptrToBank head = NULL;
+        ptrToBank newPtr; //this points to the new node
+        ptrToBank currPtr = NULL; //this points to current node in list
+        
+        newPtr = malloc(sizeof(Bank));
+        
+        if (newPtr != NULL){
+        
+            newPtr = (create_node(accountNumber, accountName, accountAmount));
+        
+            accountName = malloc(sizeof(char));
+                    
+            newPtr->accn_num = accountNumber;
+            newPtr->amount = accountAmount;
+            newPtr->name = accountName;
 
+            newPtr->nextNode = NULL;
+            currPtr = head;
 
-        int accountNumber, accountName, accountAmount;
-    while(fscanf(file, "%d %d %d", &accountName, &accountAmount, &accountNumber ) == 3){
+            if (head == NULL) {
+            head = newPtr;
 
-            ptrToBank newPtr; //this points to the new node
-            ptrToBank currPtr = NULL; //this points to current node in list
-            //create node
-            //
+            } else {
 
-            newPtr = malloc(sizeof(Bank));
-
-            if (newPtr != NULL)
-            {
-                newPtr->accn_num = x;
-                newPtr->y = y;
-
-                newPtr->nextNode = NULL;
-                currPtr = start;
-
-                if (head == NULL) {
-                    start = newPtr;
-
-                } else {
-
-                    while (currPtr->nextNode != NULL) {
-                        currPtr = currPtr->nextNode;
-                    }
-                    currPtr -> nextNode = newPtr;
-                }
+            while (currPtr->nextNode != NULL) {
+                currPtr = currPtr->nextNode;
+            }
+                
+    currPtr -> nextNode = newPtr;
+                
             }
         }
-        fclose(file);
-        return head;
     }
+    free(accountName);
+    fclose(file);
+        return head;
+}
 
     //    for loop in here to fscanf the accounts using the size from the input file
 
 
-int check_list(Bank* head, char *n, int accn, float amt){
-
-}
-
-Bank* update_list(char *str, Bank* head){
-
-}
+//int check_list(Bank* head, char *n, int accn, float amt){
+//
+//}
+//
+//Bank* update_list(char *str, Bank* head){
+//
+//}
 
 Bank* delete_node( Bank* head){
 
   ptrToBank curraNode = NULL;
   ptrToBank tempNode = NULL;
 
-  while (start->x == x)
+  while (head->accn_num < 0)
   {
-      tempNode = start;
-      start = start->nextNode;
+      tempNode = head;
+      head = head->nextNode;
       free(tempNode);
   }
-  for(curraNode = start; curraNode != NULL; curraNode = curraNode->nextNode){
-      while (curraNode->nextNode != NULL && curraNode->nextNode->x == x) {
+  for(curraNode = head; curraNode != NULL; curraNode = curraNode->nextNode){
+      while (curraNode->nextNode != NULL && curraNode->nextNode->amount < 0) {
           tempNode = curraNode->nextNode;
           curraNode ->nextNode = tempNode->nextNode;
           free(tempNode);
       }
   }
+    return head;
 }
 
-int write_output(char * str, bank*head)
+//int write_output(char * str, Bank*head){
+//}
 
-void print_list(bank *head )
+void print_list(Bank *head ){
+        
+        ptrToBank temp;
+        
+        temp = head;
+        
+        while (temp != NULL )
+        {
+            printf("%d %s %f\n", temp->accn_num, temp->name, temp->amount);
+            temp = temp->nextNode;
+        }
+}
